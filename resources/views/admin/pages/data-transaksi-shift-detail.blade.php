@@ -204,8 +204,10 @@
             <div class="dropdown">
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url('/transaksi-shift/detail/'.base64_encode($shiftDT->id)) }}"><i class="bx bx-group me-1 text-info"></i> Detail</a>
-                <a class="dropdown-item" href="#" id="shiftDT-edit-{{ $shiftDT->id }}" onClick="dataShiftDTEdit(this)" data-id="{{ base64_encode($shiftDT->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
+                {{-- <a class="dropdown-item" href="{{ url('/transaksi-shift/detail/'.base64_encode($shiftDT->id)) }}"><i class="bx bx-group me-1 text-info"></i> Detail</a> --}}
+                @if ($dtNow < $detail->masa_berlaku_akhir)
+                  <a class="dropdown-item" href="#" id="shiftDT-edit-{{ $shiftDT->id }}" onClick="dataShiftDTEdit(this)" data-id="{{ base64_encode($shiftDT->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
+                @endif
                 <a class="dropdown-item" href="#" id="shiftDT-del-{{ $shiftDT->id }}" onClick="dataShiftDTDel(this)" data-id="{{ base64_encode($shiftDT->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
               </div>
             </div>

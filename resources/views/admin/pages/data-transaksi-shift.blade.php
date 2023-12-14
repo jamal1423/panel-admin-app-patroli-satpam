@@ -49,7 +49,9 @@
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="{{ url('/transaksi-shift/detail/'.base64_encode($shiftHD->id)) }}"><i class="bx bx-group me-1 text-info"></i> Detail</a>
-                <a class="dropdown-item" href="#" id="shiftHD-edit-{{ $shiftHD->id }}" onClick="dataShiftHDEdit(this)" data-id="{{ base64_encode($shiftHD->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
+                @if ($dtNow < $shiftHD->masa_berlaku_akhir)
+                  <a class="dropdown-item" href="#" id="shiftHD-edit-{{ $shiftHD->id }}" onClick="dataShiftHDEdit(this)" data-id="{{ base64_encode($shiftHD->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
+                @endif
                 <a class="dropdown-item" href="#" id="shiftHD-del-{{ $shiftHD->id }}" onClick="dataShiftHDDel(this)" data-id="{{ base64_encode($shiftHD->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
               </div>
             </div>
@@ -177,7 +179,8 @@
               <input type="hidden" name="id" id="id-transaksi-shift">
               {{-- <input type="text" class="form-control @error('kode_shift') is-invalid @enderror" placeholder="Kode Shift" id="kode-shift" name="kode_shift" value="{{ old('kode_shift') }}"> --}}
               <select class="form-select @error('kode_shift') is-invalid @enderror" aria-label="Default select example"  id="kode-shift" name="kode_shift">
-                  @foreach ($masterShift as $shift)
+                {{-- <option value="-pilih-">- Pilih -</option>   --}}
+                @foreach ($masterShift as $shift)
                     <option value="{{ $shift->id }}">{{ $shift->kode_shift }}</option>                    
                   @endforeach
               </select>
@@ -220,7 +223,7 @@
       <div class="modal-header">
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="/master-shift/delete" method="post">
+      <form action="/get-transaksi-hd/delete" method="post">
         @csrf
         @method('delete')
         <div class="modal-body">
@@ -313,35 +316,45 @@
     @endif
 
     <script>
-        function dataShiftEdit(element) {
+        function dataShiftHDEdit(element) {
           var id = $(element).attr('data-id');
           $.ajax({
-            url: "/get-master-shift/" + id,
+            url: "/get-transaksi-hd/" + id,
             type: "GET",
             dataType: "JSON",
             success: function(data) {
               // console.log(data)
               let {
-                dataShift
+                dataTransaksiHD,
+                masterShift
               } = data
-              $('#modal-form').attr('action','{{ url("/master-shift/edit") }}');
-              $('#id-shift').val(dataShift.id);
-              $('#kode-shift').val(dataShift.kode_shift);
-              $('#kode-shift').attr('readonly', true);
-              $('#nama-shift').val(dataShift.nama_shift);
-              $('#jam-masuk').val(dataShift.jam_masuk);
-              $('#jam-pulang').val(dataShift.jam_pulang);
+              $('#modal-form').attr('action','{{ url("/transaksi-shift/edit") }}');
+              $('#id-transaksi-shift').val(dataTransaksiHD.id);
+              // $('#kode-shift').val(dataTransaksiHD.kode_shift);
+              // $('#kode-shift').attr('readonly', true);
+              var selectElement = $('#kode-shift')
+              selectElement.empty();
+              for (shift of masterShift) {
+                selectElement.append(`
+                  <option value="${shift.id}">${shift.kode_shift} [${shift.nama_shift}]</option>
+                `)
+                if (shift.id == dataTransaksiHD.kode_shift) {
+                  $("#kode-shift option[value='" + shift.id + "']").attr("selected", "selected");
+                }
+              }
+              $('#masa-berlaku-awal').val(dataTransaksiHD.masa_berlaku_awal);
+              $('#masa-berlaku-akhir').val(dataTransaksiHD.masa_berlaku_akhir);
               $('#modalForm').modal('show');
-              $('#label-modal').text('Edit Data shift');
+              $('#label-modal').text('Edit Transaksi Shift HD');
               $('#btn-modal').text('Update Data');
             }
           });
         }
       
-        function dataShiftDel(element) {
+        function dataShiftHDDel(element) {
           var id = $(element).attr('data-id');
           $.ajax({
-            url: "/get-master-shift/" + id,
+            url: "/get-transaksi-hd/" + id,
             type: "GET",
             dataType: "JSON",
             success: function(data) {

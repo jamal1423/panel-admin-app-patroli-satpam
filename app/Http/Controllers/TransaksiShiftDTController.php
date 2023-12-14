@@ -7,6 +7,7 @@ use App\Models\MTShift;
 use App\Models\Security;
 use App\Models\TransaksiShiftDT;
 use App\Models\TransaksiShiftHD;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TransaksiShiftDTController extends Controller
@@ -20,6 +21,7 @@ class TransaksiShiftDTController extends Controller
 
         $detailShiftDT = TransaksiShiftDT::where('idTransaksiHD',$getID)->paginate(10);
         $mtLokasi = Lokasi::all();
+        $dtNow = Carbon::now();
 
         return view('admin.pages.data-transaksi-shift-detail',[
             'detailShiftHD' => $detailShiftHD,
@@ -27,7 +29,8 @@ class TransaksiShiftDTController extends Controller
             'detailShiftDT' => $detailShiftDT,
             'mtLokasi' => $mtLokasi,
             'dataSecurity' => $dataSecurity,
-            'idHD' => $getID
+            'idHD' => $getID,
+            'dtNow' => $dtNow
         ]);
     }
 

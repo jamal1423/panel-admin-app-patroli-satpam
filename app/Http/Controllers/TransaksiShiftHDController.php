@@ -12,9 +12,11 @@ class TransaksiShiftHDController extends Controller
     public function data_transaksi_shift_hd(){
         $dataTransaksiHD = TransaksiShiftHD::orderBy('tgl_input_shift','DESC')->paginate(10);
         $masterShift = MTShift::all();
+        $dtNow = Carbon::now();
         return view('admin.pages.data-transaksi-shift',[
             'dataTransaksiHD' => $dataTransaksiHD,
             'masterShift' => $masterShift,
+            'dtNow' => $dtNow
         ]);
     }
 
@@ -52,5 +54,47 @@ class TransaksiShiftHDController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             return redirect('/transaksi-shift')->with('transaksiShiftError', 'Error silahkah ulangi proses');
         }
+    }
+
+    public function transaksi_shift_hd_edit(Request $request){
+        try {
+            $validatedData = $request->validate([
+                'kode_shift' => 'required',
+                'tgl_input_shift' => '',
+                'masa_berlaku_awal' => 'required',
+                'masa_berlaku_akhir' => 'required',
+            ]);
+
+            $dtNow = Carbon::now();
+
+            if($request->masa_berlaku_akhir < $request->masa_berlaku_awal){
+                // dd('tgl akhir tidak boleh kurang dari tgl awal');
+                return redirect('/transaksi-shift')->with('transaksiShiftLess','Transaksi shift less');
+            }else{
+                if($request->masa_berlaku_awal < $dtNow || $request->masa_berlaku_akhir < $dtNow){
+                    // dd('tgl tidak boleh kurang dari tgl sekarang');
+                    return redirect('/transaksi-shift')->with('transaksiShiftLess','Transaksi shift exp');
+                }else{
+                    // dd('ok proses');
+                    TransaksiShiftHD::where('id', $request->id)
+                    ->update($validatedData);
+                    return redirect('/transaksi-shift')->with('transaksiShiftEdit','Transaksi shift berhasil diubah');
+                }
+            } 
+
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect('/master-shift')->with('shiftError', 'Error silahkah ulangi proses');
+        }
+    }
+
+    public function get_transaksi_header($id){
+        $getID = base64_decode($id);
+        $dataTransaksiHD = TransaksiShiftHD::findOrFail($getID);
+        $masterShift = MTShift::all();
+        return response()->json([
+            'dataTransaksiHD' => $dataTransaksiHD,
+            'masterShift' => $masterShift
+        ]);
     }
 }
