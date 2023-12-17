@@ -62,7 +62,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/transaksi-shift',[TransaksiShiftHDController::class, 'data_transaksi_shift_hd']);
     Route::post('/transaksi-shift/add',[TransaksiShiftHDController::class, 'transaksi_shift_hd_add']);
     Route::post('/transaksi-shift/edit',[TransaksiShiftHDController::class, 'transaksi_shift_hd_edit']);
-    Route::post('/transaksi-shift/delete',[TransaksiShiftHDController::class, 'transaksi_shift_hd_delete']);
+    Route::delete('/transaksi-shift/delete',[TransaksiShiftHDController::class, 'transaksi_shift_hd_delete']);
     Route::get('/get-transaksi-hd/{id}',[TransaksiShiftHDController::class, 'get_transaksi_header']);
 
     Route::get('/transaksi-shift/detail/{id}',[TransaksiShiftDTController::class, 'transaksi_shift_detail']);

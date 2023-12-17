@@ -147,11 +147,13 @@
     </div>
   </div> --}}
 </div>
-
+@if (strtotime($dtNow) <= strtotime($detail->masa_berlaku_akhir))
 <button type="button" class="btn btn-primary mb-4 mt-4" id="btnModal" data-bs-toggle="modal" data-bs-target="#modalForm">
   <span class="tf-icons bx bx-plus-circle"></span>&nbsp; Tambah Data Satpam
 </button>
-
+@else
+<br>
+@endif
 <div class="card">
   <h5 class="card-header">List Satpam</h5>
   <div class="table-responsive text-nowrap">
@@ -201,16 +203,18 @@
           </td>
           <td>{{ $shiftDT->keterangan }}</td>
           <td>
+            @if (strtotime($dtNow) <= strtotime($detail->masa_berlaku_akhir))
             <div class="dropdown">
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
-              <div class="dropdown-menu">
+                <div class="dropdown-menu">
                 {{-- <a class="dropdown-item" href="{{ url('/transaksi-shift/detail/'.base64_encode($shiftDT->id)) }}"><i class="bx bx-group me-1 text-info"></i> Detail</a> --}}
-                @if ($dtNow < $detail->masa_berlaku_akhir)
                   <a class="dropdown-item" href="#" id="shiftDT-edit-{{ $shiftDT->id }}" onClick="dataShiftDTEdit(this)" data-id="{{ base64_encode($shiftDT->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
-                @endif
-                <a class="dropdown-item" href="#" id="shiftDT-del-{{ $shiftDT->id }}" onClick="dataShiftDTDel(this)" data-id="{{ base64_encode($shiftDT->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
-              </div>
+                  <a class="dropdown-item" href="#" id="shiftDT-del-{{ $shiftDT->id }}" onClick="dataShiftDTDel(this)" data-id="{{ base64_encode($shiftDT->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
+                </div>
             </div>
+            @else
+            -
+            @endif
           </td>
         </tr>
         @empty
@@ -313,7 +317,7 @@
               <label for="nameBasic" class="form-label">Employee ID</label>
               <input type="hidden" name="id" id="id-transaksi-shiftDT">
               <input type="hidden" name="idTransaksiHD" value="{{ $idHD }}">
-              <select class="form-select @error('employeeID') is-invalid @enderror" aria-label="Default select example"  id="empliyee-id" name="employeeID">
+              <select class="form-select @error('employeeID') is-invalid @enderror" aria-label="Default select example"  id="employee-id" name="employeeID">
                   @foreach ($dataSecurity as $security)
                     <option value="{{ $security->employeeID }}">{{ $security->employeeID." [".$security->fullname."]" }}</option>                    
                   @endforeach
@@ -361,14 +365,15 @@
       <div class="modal-header">
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="/master-shift/delete" method="post">
+      <form action="/transaksi-shift/detail/delete" method="post">
         @csrf
         @method('delete')
         <div class="modal-body">
           <div class="row">
             <div class="col mb-3">
-              <label for="nameBasic">Yakin akan hapus data <strong id="label-del"></strong>?</label>
+              <label for="nameBasic">Yakin akan hapus data <strong id="label-del"></strong> pada kode lokasi <strong id="label-del2"></strong>?</label>
               <input type="hidden" id="id-del" name="id_del">
+              <input type="hidden" name="idTransaksiHD" value="{{ $idHD }}">
             </div>
           </div>
 
@@ -438,41 +443,45 @@
     @endif
 
     <script>
-        function dataShiftEdit(element) {
+        function dataShiftDTEdit(element) {
           var id = $(element).attr('data-id');
           $.ajax({
-            url: "/get-master-shift/" + id,
+            url: "/get-transaksi-detail/" + id,
             type: "GET",
             dataType: "JSON",
             success: function(data) {
               // console.log(data)
               let {
-                dataShift
+                dataTransaksiDT,masterShift
               } = data
-              $('#modal-form').attr('action','{{ url("/master-shift/edit") }}');
-              $('#id-shift').val(dataShift.id);
-              $('#kode-shift').val(dataShift.kode_shift);
-              $('#kode-shift').attr('readonly', true);
-              $('#nama-shift').val(dataShift.nama_shift);
-              $('#jam-masuk').val(dataShift.jam_masuk);
-              $('#jam-pulang').val(dataShift.jam_pulang);
+
+              $('#modal-form').attr('action','{{ url("/transaksi-shift/detail/edit") }}');
+              $('#id-transaksi-shiftDT').val(dataTransaksiDT.id);
+              $('#employee-id').val(dataTransaksiDT.employeeID);
+              $('#kode-lokasi').val(dataTransaksiDT.kode_lokasi);
+              $('#keterangan').val(dataTransaksiDT.keterangan);
               $('#modalForm').modal('show');
-              $('#label-modal').text('Edit Data shift');
+              $('#label-modal').text('Edit Data Detail Shift');
               $('#btn-modal').text('Update Data');
             }
           });
         }
       
-        function dataShiftDel(element) {
+        function dataShiftDTDel(element) {
           var id = $(element).attr('data-id');
           $.ajax({
-            url: "/get-master-shift/" + id,
+            url: "/get-transaksi-detail/" + id,
             type: "GET",
             dataType: "JSON",
             success: function(data) {
-              let {dataShift} = data
-              $('#id-del').val(dataShift.id);
-              $('#label-del').text(dataShift.nama_shift);
+              let {dataTransaksiDT,dataSecurity} = data
+              $('#id-del').val(dataTransaksiDT.id);
+              for (security of dataSecurity) {
+                if (security.employeeID == dataTransaksiDT.employeeID) {
+                  $('#label-del').text(security.fullname);
+                  $('#label-del2').text(dataTransaksiDT.kode_lokasi);
+                }
+              }
               $('#modalHapus').modal('show');
             }
           });

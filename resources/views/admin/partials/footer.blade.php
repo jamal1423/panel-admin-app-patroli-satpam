@@ -5,7 +5,7 @@
       © <script>
       document.write(new Date().getFullYear())
       </script>
-      , SMKN Wongsorejo
+      , Sistem Informasi Patroli Satpam | Developed by startdev team.
     </div>
   </div>
 </footer>

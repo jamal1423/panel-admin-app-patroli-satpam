@@ -49,10 +49,11 @@
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="{{ url('/transaksi-shift/detail/'.base64_encode($shiftHD->id)) }}"><i class="bx bx-group me-1 text-info"></i> Detail</a>
-                @if ($dtNow < $shiftHD->masa_berlaku_akhir)
+                @if (strtotime($dtNow) <= strtotime($shiftHD->masa_berlaku_akhir))
                   <a class="dropdown-item" href="#" id="shiftHD-edit-{{ $shiftHD->id }}" onClick="dataShiftHDEdit(this)" data-id="{{ base64_encode($shiftHD->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
+                  <a class="dropdown-item" href="#" id="shiftHD-del-{{ $shiftHD->id }}" onClick="dataShiftHDDel(this)" data-id="{{ base64_encode($shiftHD->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
                 @endif
-                <a class="dropdown-item" href="#" id="shiftHD-del-{{ $shiftHD->id }}" onClick="dataShiftHDDel(this)" data-id="{{ base64_encode($shiftHD->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
+                
               </div>
             </div>
             {{-- <a href="#"><i class="bx bx-group text-info fs-10"></i></a> --}}
@@ -223,14 +224,15 @@
       <div class="modal-header">
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="/get-transaksi-hd/delete" method="post">
+      <form action="/transaksi-shift/delete" method="post">
         @csrf
         @method('delete')
         <div class="modal-body">
           <div class="row">
             <div class="col mb-3">
-              <label for="nameBasic">Yakin akan hapus data <strong id="label-del"></strong>?</label>
+              <label for="nameBasic">Yakin akan hapus data <br><strong id="label-del"></strong>?</label>
               <input type="hidden" id="id-del" name="id_del">
+              <label for="notifikasi" class="text-danger" id="notifikasi"></label>
             </div>
           </div>
 
@@ -358,9 +360,22 @@
             type: "GET",
             dataType: "JSON",
             success: function(data) {
-              let {dataShift} = data
-              $('#id-del').val(dataShift.id);
-              $('#label-del').text(dataShift.nama_shift);
+              let {dataTransaksiHD,masterShift,findTransaksiDetail} = data
+
+              var notifikasi = $('#notifikasi');
+              notifikasi.empty();
+              if(findTransaksiDetail > 0){
+                notifikasi.append(`
+                  <strong>* Ada detail data untuk transaksi ini, yakin akan dihapus?</strong>
+                `);
+              }
+              
+              $('#id-del').val(dataTransaksiHD.id);
+              for (shift of masterShift) {
+                if (shift.id == dataTransaksiHD.kode_shift) {
+                  $('#label-del').text(shift.kode_shift + ' ['+shift.nama_shift+'] | '+dataTransaksiHD.masa_berlaku_awal+' to '+dataTransaksiHD.masa_berlaku_akhir);
+                }
+              }
               $('#modalHapus').modal('show');
             }
           });

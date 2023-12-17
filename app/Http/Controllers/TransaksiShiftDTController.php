@@ -21,7 +21,7 @@ class TransaksiShiftDTController extends Controller
 
         $detailShiftDT = TransaksiShiftDT::where('idTransaksiHD',$getID)->paginate(10);
         $mtLokasi = Lokasi::all();
-        $dtNow = Carbon::now();
+        $dtNow = Carbon::now()->format('d-m-Y');
 
         return view('admin.pages.data-transaksi-shift-detail',[
             'detailShiftHD' => $detailShiftHD,
@@ -56,5 +56,44 @@ class TransaksiShiftDTController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             return redirect('/transaksi-shift/detail/'.base64_encode($request->idTransaksiHD))->with('shiftDetailError', 'Error silahkah ulangi proses');
         }
+    }
+
+    public function transaksi_shift_detail_edit(Request $request){
+        try {
+            $validatedData = $request->validate([
+                'employeeID' => 'required',
+                'kode_lokasi' => 'required',
+                'keterangan' => '',
+            ]);
+
+            // dd($validatedData);
+            $dtNow = Carbon::now()->format('d-m-Y');
+            TransaksiShiftDT::where('id', $request->id)
+            ->update($validatedData);
+            return redirect('/transaksi-shift/detail/'.base64_encode($request->idTransaksiHD))->with('shiftDetailEdit','Transaksi detail shift berhasil diubah');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect('/transaksi-shift/detail/'.base64_encode($request->idTransaksiHD))->with('shiftDetailError', 'Error silahkah ulangi proses');
+        }
+    }
+
+    public function transaksi_shift_detail_delete(Request $request){
+        try {
+            TransaksiShiftDT::destroy($request->id_del);
+            return redirect('/transaksi-shift/detail/'.base64_encode($request->idTransaksiHD))->with('shiftDetailDelete','Transaksi detail shift berhasil dihapus');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect('/transaksi-shift/detail/'.base64_encode($request->idTransaksiHD))->with('shiftDetailError', 'Error silahkah ulangi proses');
+        }
+    }
+
+    public function get_detail_transaksi($id){
+        $getID = base64_decode($id);
+        $dataTransaksiDT = TransaksiShiftDT::findOrFail($getID);
+        $masterShift = MTShift::all();
+        $dataSecurity = Security::all();
+        return response()->json([
+            'dataTransaksiDT' => $dataTransaksiDT,
+            'masterShift' => $masterShift,
+            'dataSecurity' => $dataSecurity
+        ]);
     }
 }
