@@ -31,11 +31,13 @@ class TransaksiShiftHDController extends Controller
                 'masa_berlaku_akhir' => 'required',
             ]);
 
+            
             $cekEksisData = TransaksiShiftHD::where('kode_shift','=',$request->kode_shift)
             ->where('masa_berlaku_awal','=',$request->masa_berlaku_awal)
             ->where('masa_berlaku_akhir','=',$request->masa_berlaku_akhir)->count();
-
-            $dtNow = Carbon::now()->format('d-m-Y');
+            
+            $dtNow = Carbon::now()->format('Y-m-d');
+            // dd([$validatedData, $dtNow]);
 
             if($request->masa_berlaku_akhir < $request->masa_berlaku_awal){
                 // dd('tgl akhir tidak boleh kurang dari tgl awal');
@@ -67,7 +69,7 @@ class TransaksiShiftHDController extends Controller
                 'masa_berlaku_akhir' => 'required',
             ]);
 
-            $dtNow = Carbon::now()->format('d-m-Y');
+            $dtNow = Carbon::now()->format('Y-m-d');
 
             if($request->masa_berlaku_akhir < $request->masa_berlaku_awal){
                 // dd('tgl akhir tidak boleh kurang dari tgl awal');

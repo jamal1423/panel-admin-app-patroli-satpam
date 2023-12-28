@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\API\MasterLokasiController;
+use App\Http\Controllers\API\MasterShiftController;
+use App\Http\Controllers\API\TransaksiShiftController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::get('v1/get-master-shift',[MasterShiftController::class, 'data_master_shift']);
+Route::get('v1/get-master-lokasi',[MasterLokasiController::class, 'data_master_lokasi']);
+Route::get('v1/get-transaksi-shift/{employeeID}',[TransaksiShiftController::class, 'data_transaksi_shift']);
