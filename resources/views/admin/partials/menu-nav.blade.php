@@ -65,10 +65,10 @@
     <!-- User interface -->
     
     <!-- Extended components -->
-    <li class="menu-item {{Request::is('data-admin') ? 'active' : '' }}">
-      <a href="{{ url('/data-admin') }}" class="menu-link">
+    <li class="menu-item {{Request::is('data-user') ? 'active' : '' }}">
+      <a href="{{ url('/data-user') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bxs-user-account"></i>
-        <div data-i18n="Extended UI">Data Admin</div>
+        <div data-i18n="Extended UI">Data User</div>
       </a>
     </li>
 

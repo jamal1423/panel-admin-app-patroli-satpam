@@ -7,6 +7,7 @@ use App\Models\MTShift;
 use App\Models\Security;
 use App\Models\TransaksiShiftDT;
 use App\Models\TransaksiShiftHD;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class TransaksiShiftDTController extends Controller
         $detailShiftHD = TransaksiShiftHD::where('id',$getID)->get();
         
         $masterShift = MTShift::all();
-        $dataSecurity = Security::all();
+        $dataSecurity = User::where('role','=','Security')->get();
 
         $detailShiftDT = TransaksiShiftDT::where('idTransaksiHD',$getID)->paginate(10);
         $mtLokasi = Lokasi::all();
@@ -89,7 +90,7 @@ class TransaksiShiftDTController extends Controller
         $getID = base64_decode($id);
         $dataTransaksiDT = TransaksiShiftDT::findOrFail($getID);
         $masterShift = MTShift::all();
-        $dataSecurity = Security::all();
+        $dataSecurity = User::where('role','=','Security')->get();
         return response()->json([
             'dataTransaksiDT' => $dataTransaksiDT,
             'masterShift' => $masterShift,

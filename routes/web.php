@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataSecurityController;
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AuthController::class, 'login_admin'])->name('login')->middleware('guest');
 Route::get('/login', [AuthController::class, 'login_admin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'authenticate_admin']);
-Route::get('/dashboard/logout', [AuthController::class, 'logout']);
+Route::get('/logout', [AuthController::class, 'logout']);
 
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/dashboard',[DashboardController::class, 'halaman_dashboard']);
@@ -53,11 +53,11 @@ Route::group(['middleware' => 'auth'], function() {
     Route::delete('/data-security/delete',[DataSecurityController::class, 'data_security_delete']);
     Route::get('/get-data-security/{id}', [DataSecurityController::class, 'get_data_security']);
     
-    Route::get('/data-admin',[AdminController::class, 'data_admin']);
-    Route::post('/data-admin/add',[AdminController::class, 'admin_add']);
-    Route::post('/data-admin/edit',[AdminController::class, 'admin_edit']);
-    Route::delete('/data-admin/delete',[AdminController::class, 'admin_delete']);
-    Route::get('/get-data-admin/{id}',[AdminController::class, 'get_data_admin']);
+    Route::get('/data-user',[UserController::class, 'data_user']);
+    Route::post('/data-user/add',[UserController::class, 'user_add']);
+    Route::post('/data-user/edit',[UserController::class, 'user_edit']);
+    Route::delete('/data-user/delete',[UserController::class, 'user_delete']);
+    Route::get('/get-data-user/{id}',[UserController::class, 'get_data_user']);
 
     Route::get('/transaksi-shift',[TransaksiShiftHDController::class, 'data_transaksi_shift_hd']);
     Route::post('/transaksi-shift/add',[TransaksiShiftHDController::class, 'transaksi_shift_hd_add']);

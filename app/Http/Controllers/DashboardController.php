@@ -12,7 +12,7 @@ class DashboardController extends Controller
     }
 
     public function get_data_dashboard(){
-        $dataUser = User::where('username','=', auth()->user()->username)->first();
+        $dataUser = User::where('employeeID','=', auth()->user()->employeeID)->first();
         $totalUser = User::count();
         
         return response()->json([

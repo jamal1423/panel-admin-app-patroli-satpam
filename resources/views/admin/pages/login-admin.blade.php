@@ -17,7 +17,7 @@
       @csrf
       <div class="mb-3">
         <label for="email" class="form-label">Username</label>
-        <input type="text" class="form-control" placeholder="Username" value="{{ old('username') }}" name="username" autofocus>
+        <input type="text" class="form-control" placeholder="Username" value="{{ old('employeeID') }}" name="employeeID" autofocus>
       </div>
       <div class="mb-3 form-password-toggle">
         <div class="d-flex justify-content-between">

@@ -11,37 +11,29 @@
 <div class="card">
   <h5 class="card-header">List Data Security</h5>
   <div class="table-responsive text-nowrap">
-    <table class="table">
+    <table class="table table-striped">
       <thead>
         <tr>
           <th>No.</th>
-          {{-- <th></th> --}}
-          <th>Nama</th>
-          <th>Employee ID</th>
-          <th>Role</th>
+          <th>ID Karyawan</th>
+          <th>Nama Karyawan</th>
+          <th>Gender</th>
           <th>#</th>
         </tr>
       </thead>
       <tbody class="table-border-bottom-0">
-        @forelse($dataSecurity as $key=>$user)
+        @forelse($dataSecurity as $key=>$security)
         <tr>
           <td>{{ $dataSecurity->firstItem()+$key }}</td>
-          {{-- <td>
-            @if($admin->foto == "")
-            <img src="{{ asset('foto-admin/user.png') }}" width="40px">
-            @else
-            <img src="{{ asset('foto-admin/'.$admin->foto) }}" width="40px">
-            @endif
-          </td> --}}
-          <td>{{ $user->fullname }}</td>
-          <td>{{ $user->employeeID }}</td>
-          <td>{{ $user->role }}</td>
+          <td>{{ $security->employeeID }}</td>
+          <td>{{ $security->fullname }}</td>
+          <td>{{ $security->gender }}</td>
           <td>
             <div class="dropdown">
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="#" id="sec-edit-{{ $user->id }}" onClick="dataSecurityEdit(this)" data-id="{{ base64_encode($user->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
-                <a class="dropdown-item" href="#" id="sec-del-{{ $user->id }}" onClick="dataSecurityDel(this)" data-id="{{ base64_encode($user->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
+                <a class="dropdown-item" href="#" id="security-edit-{{ $security->id }}" onClick="dataSecurityEdit(this)" data-id="{{ base64_encode($security->id) }}"><i class="bx bx-edit-alt me-1 text-primary"></i> Edit</a>
+                <a class="dropdown-item" href="#" id="security-del-{{ $security->id }}" onClick="dataSecurityDel(this)" data-id="{{ base64_encode($security->id) }}"><i class="bx bx-trash me-1 text-danger"></i> Hapus</a>
               </div>
             </div>
           </td>
@@ -67,7 +59,7 @@
             <option value="bg-success">Success</option>
         @endif
         
-        @if(Session::get('securityAlready'))
+        @if(Session::get('idAlready'))
             <option value="bg-warning">Warning</option>
         @endif
         
@@ -105,16 +97,16 @@
         Security baru berhasil ditambahkan.
       @endif
       
-      @if(Session::get('securityAlready'))
-        ID employee telah tersedia, mohon cek kembali.
+      @if(Session::get('idAlready'))
+        ID telah tersedia, mohon cek kembali.
       @endif
       
       @if(Session::get('securityEdit'))
-        Data security berhasil diubah.
+        Data Security berhasil diubah.
       @endif
       
       @if(Session::get('securityDelete'))
-        Data security berhasil dihapus.
+        Data Security berhasil dihapus.
       @endif
       
       @if(Session::get('securityError'))
@@ -136,78 +128,54 @@
         @csrf
         @method('post')
         <div class="modal-body">
-            <div class="row">
+            {{-- <div class="row">
               <div class="col col-lg-12">
-                <div id="imgUser"></div>
+                <div id="imgSecurity"></div>
               </div>
-            </div>
+            </div> --}}
             <div class="row">
               <div class="col col-lg-12">
                   <div class="row">
-                      <div class="col col-lg-6 mb-3">
-                          <label for="nameBasic" class="form-label">Nama</label>
-                          <input type="hidden" name="id" id="id-user">
-                          <input type="text" class="form-control @error('fullname') is-invalid @enderror" placeholder="Nama User" id="nama-user" name="fullname" value="{{ old('fullname') }}">
-                          @error('fullname')
-                              <div class="form-text text-danger">{{ $message }}</div>
-                          @enderror
-                      </div>
-                      
-                      <div class="col col-lg-6 mb-3">
-                          <label for="nameBasic" class="form-label">Employee ID</label>
-                          <input type="text" class="form-control @error('employeeID') is-invalid @enderror" placeholder="Employee ID" id="employee-id" name="employeeID" value="{{ old('employeeID') }}">
-                          @error('employeeID')
-                              <div class="form-text text-danger">{{ $message }}</div>
-                          @enderror
-                      </div>
+                    <div class="col col-lg-6 mb-3">
+                      <label for="nameBasic" class="form-label">ID Security</label>
+                      <input type="text" class="form-control @error('employeeID') is-invalid @enderror" placeholder="ID Security" id="employee-id" name="employeeID" value="{{ old('employeeID') }}">
+                      @error('employeeID')
+                          <div class="form-text text-danger">{{ $message }}</div>
+                      @enderror
+                    </div>
+
+                    <div class="col col-lg-6 mb-3">
+                      <label for="nameBasic" class="form-label">Nama Security</label>
+                      <input type="hidden" name="id" id="id-security">
+                      <input type="text" class="form-control @error('fullname') is-invalid @enderror" placeholder="Nama Security" id="nama-security" name="fullname" value="{{ old('fullname') }}">
+                      @error('fullname')
+                          <div class="form-text text-danger">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
               </div>
             </div>
-
+            
             <div class="row">
               <div class="col col-lg-12">
-                <div class="row">
+                  <div class="row">
                     <div class="col mb-3">
-                      <label for="emailBasic" class="form-label">Role</label>
-                      <select class="form-select" aria-label="Default select example" id="role-user" name="role">
-                        <option value="Security">Security</option>
+                      <label for="emailBasic" class="form-label">Jenis Kelamin</label>
+                      <select class="form-select" aria-label="Default select example" id="gender" name="gender">
+                          <option selected="">Pilih Jenis Kelamin</option>
+                          <option value="Pria">Pria</option>
+                          <option value="Wanita">Wanita</option>
                       </select>
                     </div>
                     
                     <div class="col mb-3">
-                      <label for="emailBasic" class="form-label">Gender</label>
-                      <select class="form-select" aria-label="Default select example" id="gender" name="gender">
-                        <option selected="">Pilih Jenis Gender</option>
-                        <option value="Pria">Pria</option>
-                        <option value="Wanita">Wanita</option>
-                      </select>
-                    </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col col-lg-12">
-                <div class="row">
-                  <div class="col mb-3">
-                    <label for="nameBasic" class="form-label">Foto User</label>
-                    <div class="input-group">
-                    <input type="file" class="form-control @error('foto') is-invalid @enderror" id="foto-user" name="foto">
-                    <input type="hidden" name="oldImage" id="oldImage">
-                    </div>
-                    @error('foto')
-                    <div class="form-text text-danger">{{ $message }}</div>
-                    @enderror
-                  </div>
-                  
-                  <div class="col mb-3">
                       <label for="nameBasic" class="form-label">Password</label>
-                      <input class="form-control" type="text" name="password" id="password-user" autocomplete="off" placeholder="Password" value="{{ old('password') }}">
+                      <input class="form-control" type="text" name="password" id="password-security" placeholder="Password" value="{{ old('password') }}" autocomplete="off">
                       @error('password')
                           <div class="form-text text-danger">{{ $message }}</div>
                       @enderror
+                    </div>
                   </div>
-                </div>
               </div>
             </div>
             
@@ -234,9 +202,9 @@
         <div class="modal-body">
           <div class="row">
             <div class="col mb-3">
-              <label for="nameBasic">Yakin akan hapus data user <strong id="label-del"></strong>?</label>
+              <label for="nameBasic">Yakin akan hapus data siswa <strong id="label-del"></strong>?</label>
               <input type="hidden" id="id-del" name="id_del">
-              <input type="hidden" name="oldImageDel" id="oldImageDel">
+              {{-- <input type="hidden" name="oldImageDel" id="oldImageDel"> --}}
             </div>
           </div>
 
@@ -254,7 +222,8 @@
 @endsection
 
 @push('scripts')
-  <script src="{{ asset('admin/assets/js/ui-toasts.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/ui-toasts.js') }}"></script>
+
     @if (count($errors) > 0)
     <script type="text/javascript">
       $(document).ready(function(){
@@ -271,7 +240,7 @@
     </script>
     @endif
     
-    @if(Session::get('securityAlready'))
+    @if(Session::get('nisAlready'))
     <script>
       window.onload = function() {
         $("#showToastPlacement").click();
@@ -311,46 +280,37 @@
             type: "GET",
             dataType: "JSON",
             success: function(data) {
-              var imgElement = $('#imgUser');
-					    imgElement.empty();
+              // var imgElement = $('#imgSiswa');
+					    // imgElement.empty();
 
               let {
-                dataSecurity,
+                dataSecurity
               } = data
+              $('#id-security').val(dataSecurity.id);
               $('#modal-form').attr('action','{{ url("/data-security/edit") }}');
-              $('#id-user').val(dataSecurity.id);
-              $('#nama-user').val(dataSecurity.fullname);
               $('#employee-id').val(dataSecurity.employeeID);
+              $('#nama-security').val(dataSecurity.fullname);
               $('#employee-id').prop('readonly', true);
-
-              $('#oldImage').val(dataSecurity.foto);
-
-              var selectElementRole = $('#role-user')   
-              selectElementRole.empty();
-              selectElementRole.append(`
-                <option value="Security">Security</option>
-              `)
-              $("#role-user option[value='" + dataSecurity.role + "']").attr("selected", "selected");
               
               var selectElementJk = $('#gender')   
               selectElementJk.empty();
               selectElementJk.append(`
-                <option>Pilih Jenis Gender</option>
+                <option>Pilih Jenis Kelamin</option>
                 <option value="Pria">Pria</option>
                 <option value="Wanita">Wanita</option>
               `)
               $("#gender option[value='" + dataSecurity.gender + "']").attr("selected", "selected");
 
               $('#modalForm').modal('show');
-              $('#label-modal').text('Edit Data User');
+              $('#label-modal').text('Edit Data Security');
               $('#btn-modal').text('Update Data');
-              $('#imgUser').css("display","block");
+              // $('#imgSiswa').css("display","block");
 
-              var imgs = dataSecurity.foto;
-              var elem = document.createElement("img");
-              elem.setAttribute("src", "/foto-user/" + imgs);
-              elem.className="rounded-circle avatar avatar-xl pull-up mb-2";
-              document.getElementById("imgUser").appendChild(elem);
+              // var imgs = dataSiswa.foto;
+              // var elem = document.createElement("img");
+              // elem.setAttribute("src", "/foto-siswa/" + imgs);
+              // elem.className="rounded-circle avatar avatar-xl pull-up mb-2";
+              // document.getElementById("imgSiswa").appendChild(elem);
             }
           });
         }
@@ -365,7 +325,7 @@
               let {dataSecurity} = data
               $('#id-del').val(dataSecurity.id);
               $('#label-del').text(dataSecurity.fullname);
-              $('#oldImageDel').val(dataSecurity.foto);
+              // $('#oldImageDel').val(dataSiswa.foto);
               $('#modalHapus').modal('show');
             }
           });

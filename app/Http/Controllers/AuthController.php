@@ -13,7 +13,7 @@ class AuthController extends Controller
 
     public function authenticate_admin(Request $request){
         $credentials = $request->validate([
-            'username'=>'required',
+            'employeeID'=>'required',
             'password'=>'required'
         ]);
 

@@ -17,13 +17,6 @@ class TransaksiShiftController extends Controller
             $dyNow = Carbon::now()->format('d');
             $yrNow = Carbon::now()->format('Y');
             
-            //$cekShiftHD = TransaksiShiftHD::whereDate('masa_berlaku_awal', '>=', $dtNow)
-            //->whereDate('masa_berlaku_akhir', '<=', $dtNow)
-            // ->whereDay('masa_berlaku_awal','=', $dyNow)
-            // ->whereMonth('masa_berlaku_awal','=', $mnNow)
-            // ->whereYear('masa_berlaku_awal','=', $yrNow)
-            // ->orderBy('tgl_input_shift', 'DESC')
-            //->get();
             $cekShiftHD = DB::table('tbl_transaksi_shift_hd')
             ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
             'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
@@ -31,24 +24,82 @@ class TransaksiShiftController extends Controller
             'tbl_transaksi_shift_dt.employeeID')
             ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
             ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
-            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '>=', $dtNow)
-            ->orderBy('tbl_transaksi_shift_hd.tgl_input_shift','DESC')
-            ->first();
-
-            $transaksiShift = DB::table('tbl_transaksi_shift_hd')
-            ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
-            'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
-            'tbl_transaksi_shift_hd.masa_berlaku_akhir','tbl_transaksi_shift_dt.*')
-            ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
-            ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
-            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '>=', $cekShiftHD->masa_berlaku_awal)
-            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_akhir', '<=', $cekShiftHD->masa_berlaku_akhir)
+            ->whereMonth('tbl_transaksi_shift_hd.masa_berlaku_awal', '=', $mnNow)
+            ->whereYear('tbl_transaksi_shift_hd.masa_berlaku_awal', '=', $yrNow)
             ->get();
 
-            return response()->json([
-                'status' => 'success',
-                'results' => $transaksiShift
-            ]);
+            $countShiftHD = DB::table('tbl_transaksi_shift_hd')
+            ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
+            'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
+            'tbl_transaksi_shift_hd.masa_berlaku_akhir','tbl_transaksi_shift_dt.idTransaksiHD',
+            'tbl_transaksi_shift_dt.employeeID')
+            ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
+            ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
+            ->whereMonth('tbl_transaksi_shift_hd.masa_berlaku_awal', '=', $mnNow)
+            ->whereYear('tbl_transaksi_shift_hd.masa_berlaku_awal', '=', $yrNow)
+            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_akhir', '>=', $dtNow)
+            ->count();
+
+            foreach($cekShiftHD as $cekSHD){
+                $dtBegin = $cekSHD->masa_berlaku_awal;
+                $dtEnd = $cekSHD->masa_berlaku_akhir;
+                if (($dtNow >= $dtBegin) && ($dtNow <= $dtEnd)){
+                    $a=$dtBegin;
+                    $b=$dtEnd;
+
+                    $transaksiShift = DB::table('tbl_transaksi_shift_hd')
+                    ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
+                    'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
+                    'tbl_transaksi_shift_hd.masa_berlaku_akhir','tbl_transaksi_shift_dt.*')
+                    ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
+                    ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
+                    ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '>=', $a)
+                    ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_akhir', '<=', $b)
+                    ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_akhir', '>=', $dtNow)
+                    ->get();
+                }
+            }
+            
+            $transaksiShiftNow = DB::table('tbl_transaksi_shift_hd')
+            ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
+            'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
+            'tbl_transaksi_shift_hd.masa_berlaku_akhir','tbl_transaksi_shift_dt.idTransaksiHD',
+            'tbl_transaksi_shift_dt.employeeID')
+            ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
+            ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
+            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '>=', $dtNow)
+            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '<=', $dtNow)
+            ->get();
+
+            $countShiftHDNow = DB::table('tbl_transaksi_shift_hd')
+            ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
+            'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
+            'tbl_transaksi_shift_hd.masa_berlaku_akhir','tbl_transaksi_shift_dt.idTransaksiHD',
+            'tbl_transaksi_shift_dt.employeeID')
+            ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
+            ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
+            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '>=', $dtNow)
+            ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_akhir', '<=', $dtNow)
+            ->count();
+
+            if($countShiftHDNow > 0){
+                return response()->json([
+                    'status' => 'success',
+                    'results' => $transaksiShiftNow
+                ]);
+            }else{
+                if($countShiftHD > 0){
+                    return response()->json([
+                        'status' => 'success',
+                        'results' => $transaksiShift
+                    ]);
+                }else{
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'data not found'
+                    ]);
+                }
+            }
 
         } catch (\Illuminate\Database\QueryException $e) {
             return response()->json([
