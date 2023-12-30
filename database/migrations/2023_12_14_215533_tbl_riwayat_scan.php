@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_riwayat_can', function(Blueprint $table){
+        Schema::create('tbl_riwayat_scan', function(Blueprint $table){
             $table->id();
             $table->dateTime('tgl_scan');
             $table->string('kode_shift');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_riwayat_can');
+        Schema::dropIfExists('tbl_riwayat_scan');
     }
 };

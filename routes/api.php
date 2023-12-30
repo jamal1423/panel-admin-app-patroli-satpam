@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\ApiAuthController;
+use App\Http\Controllers\API\DataUserController;
 use App\Http\Controllers\API\MasterLokasiController;
 use App\Http\Controllers\API\MasterShiftController;
 use App\Http\Controllers\API\TransaksiShiftController;
@@ -27,3 +28,4 @@ Route::get('v1/get-master-shift',[MasterShiftController::class, 'data_master_shi
 Route::get('v1/get-master-lokasi',[MasterLokasiController::class, 'data_master_lokasi']);
 Route::get('v1/get-transaksi-shift/{employeeID}',[TransaksiShiftController::class, 'data_transaksi_shift']);
 Route::post('v1/proses-login',[ApiAuthController::class, 'login']);
+Route::get('v1/get-data-user/{employeeID}',[DataUserController::class, 'data_user']);
