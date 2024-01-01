@@ -50,8 +50,17 @@ class TransaksiShiftController extends Controller
                     $transaksiShift = DB::table('tbl_transaksi_shift_hd')
                     ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
                     'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
-                    'tbl_transaksi_shift_hd.masa_berlaku_akhir','tbl_transaksi_shift_dt.*')
+                    'tbl_transaksi_shift_hd.masa_berlaku_akhir',
+                    'tbl_transaksi_shift_dt.id','tbl_transaksi_shift_dt.idTransaksiHD','tbl_transaksi_shift_dt.employeeID',
+                    'tbl_transaksi_shift_dt.kode_lokasi','tbl_transaksi_shift_dt.keterangan',
+                    'tbl_lokasi.kode_lokasi','tbl_lokasi.nama_lokasi','tbl_lokasi.latitude','tbl_lokasi.longitude','tbl_lokasi.radius',
+                    'tbl_mt_shift.kode_shift','tbl_mt_shift.nama_shift','tbl_mt_shift.jam_masuk','tbl_mt_shift.jam_pulang',
+                    'users.fullname','users.employeeID'
+                    )
                     ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
+                    ->join('tbl_lokasi','tbl_transaksi_shift_dt.kode_lokasi','=','tbl_lokasi.kode_lokasi')
+                    ->join('tbl_mt_shift','tbl_transaksi_shift_hd.kode_shift','=','tbl_mt_shift.id')
+                    ->join('users','tbl_transaksi_shift_dt.employeeID','=','users.employeeID')
                     ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
                     ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '>=', $a)
                     ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_akhir', '<=', $b)
@@ -63,9 +72,17 @@ class TransaksiShiftController extends Controller
             $transaksiShiftNow = DB::table('tbl_transaksi_shift_hd')
             ->select('tbl_transaksi_shift_hd.id','tbl_transaksi_shift_hd.tgl_input_shift',
             'tbl_transaksi_shift_hd.kode_shift','tbl_transaksi_shift_hd.masa_berlaku_awal',
-            'tbl_transaksi_shift_hd.masa_berlaku_akhir','tbl_transaksi_shift_dt.idTransaksiHD',
-            'tbl_transaksi_shift_dt.employeeID')
+            'tbl_transaksi_shift_hd.masa_berlaku_akhir',
+            'tbl_transaksi_shift_dt.id','tbl_transaksi_shift_dt.idTransaksiHD','tbl_transaksi_shift_dt.employeeID',
+            'tbl_transaksi_shift_dt.kode_lokasi','tbl_transaksi_shift_dt.keterangan',
+            'tbl_lokasi.kode_lokasi','tbl_lokasi.nama_lokasi','tbl_lokasi.latitude','tbl_lokasi.longitude','tbl_lokasi.radius',
+            'tbl_mt_shift.kode_shift','tbl_mt_shift.nama_shift','tbl_mt_shift.jam_masuk','tbl_mt_shift.jam_pulang',
+            'users.fullname','users.employeeID'
+            )
             ->join('tbl_transaksi_shift_dt','tbl_transaksi_shift_hd.id','=','tbl_transaksi_shift_dt.idTransaksiHD')
+            ->join('tbl_lokasi','tbl_transaksi_shift_dt.kode_lokasi','=','tbl_lokasi.kode_lokasi')
+            ->join('tbl_mt_shift','tbl_transaksi_shift_hd.kode_shift','=','tbl_mt_shift.id')
+            ->join('users','tbl_transaksi_shift_dt.employeeID','=','users.employeeID')
             ->where('tbl_transaksi_shift_dt.employeeID','=', $employeeID)
             ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '>=', $dtNow)
             ->whereDate('tbl_transaksi_shift_hd.masa_berlaku_awal', '<=', $dtNow)
@@ -83,16 +100,10 @@ class TransaksiShiftController extends Controller
             ->count();
 
             if($countShiftHDNow > 0){
-                return response()->json([
-                    'status' => 'success',
-                    'results' => $transaksiShiftNow
-                ]);
+                return response()->json($transaksiShiftNow);
             }else{
                 if($countShiftHD > 0){
-                    return response()->json([
-                        'status' => 'success',
-                        'results' => $transaksiShift
-                    ]);
+                    return response()->json($transaksiShift);
                 }else{
                     return response()->json([
                         'status' => 'error',
